@@ -1,9 +1,10 @@
 package parser
 
 import (
-	"bgo/types"
 	"go/ast"
 	"go/token"
+
+	"github.com/oswaldoooo/bgo/types"
 )
 
 // func init(){

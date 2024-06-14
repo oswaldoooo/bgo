@@ -1,9 +1,10 @@
 package parser
 
 import (
-	"bgo/internal/utils"
-	"bgo/types"
 	"go/ast"
+
+	"github.com/oswaldoooo/bgo/internal/utils"
+	"github.com/oswaldoooo/bgo/types"
 )
 
 func parseFunc(src *ast.FuncDecl, packages types.Packages, currpkg *types.Package) error {

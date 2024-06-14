@@ -1,8 +1,6 @@
 package test
 
 import (
-	bparser "bgo/parser"
-	"bgo/types"
 	"encoding/json"
 	"fmt"
 	"go/ast"
@@ -12,6 +10,9 @@ import (
 	"runtime"
 	"strconv"
 	"testing"
+
+	bparser "github.com/oswaldoooo/bgo/parser"
+	"github.com/oswaldoooo/bgo/types"
 )
 
 func TestParse(t *testing.T) {

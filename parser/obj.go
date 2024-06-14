@@ -1,12 +1,13 @@
 package parser
 
 import (
-	"bgo/internal/utils"
-	"bgo/types"
 	"errors"
 	"fmt"
 	"go/ast"
 	"strings"
+
+	"github.com/oswaldoooo/bgo/internal/utils"
+	"github.com/oswaldoooo/bgo/types"
 )
 
 func parseobj(src *ast.GenDecl, packages types.Packages, currpkg *types.Package) error {
