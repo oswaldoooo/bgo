@@ -20,36 +20,45 @@ type Kind uint8
 const (
 	Invalid Kind = iota
 	StructType
+	FieldType
 	FuncType
 	VariableType
 	ConstType
 )
 
+type Comment []string
 type Struct struct {
-	Kind   Kind
-	Fields []Field
-	Name   string
-	Ident  string //default is null
+	Kind    Kind
+	Fields  []Field
+	Name    string
+	Ident   string //default is null
+	Comment Comment
 }
 type Field struct {
-	Name string
-	Tag  string
+	Kind    Kind
+	Name    string
+	Tag     string
+	Comment Comment
 }
 type Func struct {
-	Kind Kind
-	Self string
-	Args []string //type like name:type
-	Resp []string
+	Kind    Kind
+	Name    string
+	Comment Comment
+	Self    string
+	Params  []string //type like name-type
+	Resp    []string
 }
 
 type Variable struct {
-	Kind  Kind
-	Name  string
-	Value string
+	Kind    Kind
+	Name    string
+	Value   string
+	Comment Comment
 }
 
 type Const struct {
-	Kind  Kind
-	Name  string
-	Value string
+	Kind    Kind
+	Name    string
+	Value   string
+	Comment Comment
 }

@@ -2,7 +2,6 @@ package parser
 
 import (
 	"bgo/types"
-	"errors"
 	"go/ast"
 	"go/token"
 )
@@ -25,11 +24,11 @@ func Parse(atree *ast.File, dst types.Packages) error {
 			case token.TYPE:
 				err = parseobj(ee, dst, pobj)
 			case token.CONST:
-				panic("not implement")
+				err = parseconst(ee, dst, pobj)
 			case token.VAR:
-				panic("not implement")
+				err = parsevar(ee, dst, pobj)
 			default:
-				return errors.New("unknown keyword " + ee.Tok.String())
+				println("unknown keyword " + ee.Tok.String())
 			}
 			if err != nil {
 				return err
