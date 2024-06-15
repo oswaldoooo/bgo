@@ -11,6 +11,10 @@ func parseFunc(src *ast.FuncDecl, packages types.Packages, currpkg *types.Packag
 	var ft types.Func
 	ft.Kind = types.FuncType
 	ft.Name = src.Name.Name
+	if src.Doc != nil && len(src.Doc.List) > 0 {
+		ft.Comment = make(types.Comment, len(src.Doc.List))
+		utils.SliceConvert(src.Doc.List, ft.Comment, commentparse)
+	}
 	if src.Recv != nil && len(src.Recv.List) > 0 {
 		//parse self
 		expr := src.Recv.List[0]

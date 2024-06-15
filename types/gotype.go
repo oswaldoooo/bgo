@@ -1,5 +1,10 @@
 package types
 
+import (
+	"go/ast"
+	"go/token"
+)
+
 //golang types
 //all name is include type. format like name:type
 
@@ -61,4 +66,9 @@ type Const struct {
 	Name    string
 	Value   string
 	Comment Comment
+}
+
+type Raw struct {
+	Fs     *token.FileSet
+	Astree *ast.File
 }
