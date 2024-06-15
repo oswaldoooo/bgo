@@ -11,12 +11,12 @@ import (
 // 	parser.ParseFile()
 // }
 
-func Parse(atree *ast.File, dst types.Packages) error {
+func Parse(atree *ast.File, dst *types.Packages) error {
 	pkgname := atree.Name.Name
-	if _, ok := dst[pkgname]; !ok {
-		dst[pkgname] = types.NewPackage()
+	if _, ok := dst.Pkgs[pkgname]; !ok {
+		dst.Pkgs[pkgname] = types.NewPackage()
 	}
-	pobj := dst[pkgname]
+	pobj := dst.Pkgs[pkgname]
 	var err error
 	for _, e := range atree.Decls {
 		if ee, ok := e.(*ast.GenDecl); ok {

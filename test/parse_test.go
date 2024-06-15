@@ -17,12 +17,13 @@ import (
 
 func TestParse(t *testing.T) {
 	af := parse("example.go")
-	pkg := make(types.Packages)
+	pkg := types.NewPackages()
 	err := bparser.Parse(af, pkg)
 	throw(err)
-	for k, p := range pkg {
-		content, _ := json.MarshalIndent(p, "", "    ")
-		os.WriteFile(k+".json", content, 0644)
+	content, _ := json.MarshalIndent(pkg, "", "    ")
+	err = os.WriteFile("test.json", content, 0644)
+	if err != nil {
+		t.Fatal(err)
 	}
 }
 func TestShowOrigin(t *testing.T) {

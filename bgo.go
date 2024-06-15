@@ -8,13 +8,13 @@ import (
 	"github.com/oswaldoooo/bgo/types"
 )
 
-func Parse(rpath string) (types.Raw, types.Packages, error) {
+func Parse(rpath string) (types.Raw, *types.Packages, error) {
 	fs := token.NewFileSet()
 	asf, err := stdparser.ParseFile(fs, rpath, nil, stdparser.ParseComments|stdparser.AllErrors)
 	if err != nil {
 		return types.Raw{}, nil, err
 	}
-	ans := make(types.Packages)
+	ans := types.NewPackages()
 	err = parser.Parse(asf, ans)
 	return types.Raw{
 		Fs:     fs,

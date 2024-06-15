@@ -7,7 +7,7 @@ import (
 	"github.com/oswaldoooo/bgo/types"
 )
 
-func parseFunc(src *ast.FuncDecl, packages types.Packages, currpkg *types.Package) error {
+func parseFunc(src *ast.FuncDecl, packages *types.Packages, currpkg *types.Package) error {
 	var ft types.Func
 	ft.Kind = types.FuncType
 	ft.Name = src.Name.Name

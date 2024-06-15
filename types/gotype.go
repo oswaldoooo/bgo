@@ -9,7 +9,22 @@ import (
 //all name is include type. format like name:type
 
 // pkg=type
-type Packages map[string]*Package
+type Packages struct {
+	Pkgs       map[string]*Package
+	VarGroups  []Group[[]Variable]
+	ConstGroup []Group[[]Const]
+}
+
+func NewPackages() *Packages {
+	return &Packages{
+		Pkgs: make(map[string]*Package),
+	}
+}
+
+type Group[T any] struct {
+	Comments Comment //group comment
+	Members  T
+}
 type Package struct {
 	Variables map[string]Variable
 	Const     map[string]Const

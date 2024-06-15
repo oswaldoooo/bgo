@@ -10,7 +10,7 @@ import (
 	"github.com/oswaldoooo/bgo/types"
 )
 
-func parseobj(src *ast.GenDecl, packages types.Packages, currpkg *types.Package) error {
+func parseobj(src *ast.GenDecl, packages *types.Packages, currpkg *types.Package) error {
 	if len(src.Specs) == 0 {
 		fmt.Println("warning: not found spec at ", src.TokPos)
 		return nil
@@ -72,9 +72,20 @@ func parsestruct(input *ast.StructType, _dst *types.Struct) {
 }
 
 // parse variable
-func parsevar(src *ast.GenDecl, packages types.Packages, currpkg *types.Package) error {
+func parsevar(src *ast.GenDecl, packages *types.Packages, currpkg *types.Package) error {
 	if len(src.Specs) == 0 {
 		return nil
+	}
+	//todo: add to var group if count >1
+	var (
+		add2group = len(src.Specs) > 1
+		group     types.Group[[]types.Variable]
+	)
+	if add2group {
+		if src.Doc != nil && len(src.Doc.List) > 0 {
+			group.Comments = make(types.Comment, len(src.Doc.List))
+			utils.SliceConvert(src.Doc.List, group.Comments, commentparse)
+		}
 	}
 	for _, spec := range src.Specs {
 		var vtp types.Variable
@@ -96,18 +107,33 @@ func parsevar(src *ast.GenDecl, packages types.Packages, currpkg *types.Package)
 			utils.SliceConvert(vspec.Doc.List, vtp.Comment, commentparse)
 		}
 		currpkg.Variables[getRawName(vtp.Name)] = vtp
+		group.Members = append(group.Members, vtp)
+	}
+	if add2group {
+		packages.VarGroups = append(packages.VarGroups, group)
 	}
 	return nil
 }
 
 // parse const
-func parseconst(src *ast.GenDecl, packages types.Packages, currpkg *types.Package) error {
+func parseconst(src *ast.GenDecl, packages *types.Packages, currpkg *types.Package) error {
 	if len(src.Specs) == 0 {
 		return nil
 	}
 	var (
 		last_type string
 	)
+	//todo: add to const group if count >1
+	var (
+		add2group = len(src.Specs) > 1
+		group     types.Group[[]types.Const]
+	)
+	if add2group {
+		if src.Doc != nil && len(src.Doc.List) > 0 {
+			group.Comments = make(types.Comment, len(src.Doc.List))
+			utils.SliceConvert(src.Doc.List, group.Comments, commentparse)
+		}
+	}
 	for _, spec := range src.Specs {
 		var vtp types.Const
 		vtp.Kind = types.ConstType
@@ -136,6 +162,12 @@ func parseconst(src *ast.GenDecl, packages types.Packages, currpkg *types.Packag
 			utils.SliceConvert(vspec.Doc.List, vtp.Comment, commentparse)
 		}
 		currpkg.Const[getRawName(vtp.Name)] = vtp
+		if add2group {
+			group.Members = append(group.Members, vtp)
+		}
+	}
+	if add2group {
+		packages.ConstGroup = append(packages.ConstGroup, group)
 	}
 	return nil
 }
