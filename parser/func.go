@@ -51,9 +51,8 @@ func parseFunc(src *ast.FuncDecl, packages *types.Packages, currpkg *types.Packa
 }
 func funcparamsParse(src *ast.Field, dst *string) {
 	if len(src.Names) > 0 {
-		*dst = src.Names[0].Name
+		*dst = src.Names[0].Name + ":"
 	}
-	*dst += "-"
 	if ident, ok := src.Type.(*ast.Ident); ok {
 		*dst += ident.Name
 	} else if ident, ok := src.Type.(*ast.StarExpr); ok {
