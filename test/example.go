@@ -1,11 +1,24 @@
 package test
 
-import "context"
+import (
+	"context"
+
+	"github.com/oswaldoooo/bgo/types"
+)
 
 // gen_controller
 type Greeter struct {
 	Ctx      context.Context
 	ModuleId int32
+}
+type X interface {
+	X() int32
+}
+
+// this is validator
+type Validator interface {
+	X
+	Validate(any) error
 }
 
 // gen_enum
@@ -24,3 +37,9 @@ var (
 	// default_gen
 	DefaultModule = Start
 )
+
+type Greeter2 struct{}
+
+func GetMyName() *types.Group[string] {
+	return &types.Group[string]{}
+}

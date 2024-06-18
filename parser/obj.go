@@ -28,9 +28,18 @@ func parseobj(src *ast.GenDecl, packages *types.Packages, currpkg *types.Package
 		utils.SliceConvert(src.Doc.List, structtp.Comment, commentparse)
 	}
 	//fill
-	structType, ok := stype.Type.(*ast.StructType)
-	if ok {
+
+	if structType, ok := stype.Type.(*ast.StructType); ok {
 		parsestruct(structType, &structtp)
+	} else if iftype, ok := stype.Type.(*ast.InterfaceType); ok {
+		//support for interface type
+		var dsttype types.Interface
+		dsttype.Kind = types.InterfaceType
+		dsttype.Name = stype.Name.Name
+		dsttype.Comment = structtp.Comment
+		parseInterface(iftype, &dsttype)
+		currpkg.Interface[dsttype.Name] = dsttype
+		return nil
 	} else {
 		ident, ok := stype.Type.(*ast.Ident)
 		if !ok {
@@ -207,4 +216,30 @@ func parsevalue(stp []*ast.Ident, src []ast.Expr) (result string) {
 
 	// }
 	return
+}
+
+// parse function info to interface struct
+func parseInterface(input *ast.InterfaceType, _dst *types.Interface) {
+	if input.Methods != nil && input.Methods.List != nil && len(input.Methods.List) > 0 {
+		_dst.Funcs = make([]types.Func, len(input.Methods.List))
+		utils.SliceConvert(input.Methods.List, _dst.Funcs, func(src *ast.Field, dst *types.Func) {
+			if src.Doc != nil && len(src.Doc.List) > 0 {
+				dst.Comment = make(types.Comment, len(src.Doc.List))
+				utils.SliceConvert(src.Doc.List, dst.Comment, commentparse)
+			}
+			dst.Kind = types.FuncType
+			dst.Name = src.Names[0].Name
+			if ftp, ok := src.Type.(*ast.FuncType); ok {
+				if ftp.Params != nil && len(ftp.Params.List) > 0 {
+					dst.Params = make([]string, len(ftp.Params.List))
+					utils.SliceConvert(ftp.Params.List, dst.Params, funcparamsParse)
+				}
+				if ftp.Results != nil && len(ftp.Results.List) > 0 {
+					dst.Resp = make([]string, len(ftp.Results.List))
+					utils.SliceConvert(ftp.Results.List, dst.Resp, funcparamsParse)
+				}
+			}
+		})
+
+	}
 }

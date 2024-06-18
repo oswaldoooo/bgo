@@ -30,6 +30,7 @@ type Package struct {
 	Const     map[string]Const
 	Func      map[string]Func
 	Struct    map[string]Struct
+	Interface map[string]Interface
 }
 type Type struct {
 	Kind Kind
@@ -44,6 +45,7 @@ const (
 	FuncType
 	VariableType
 	ConstType
+	InterfaceType
 )
 
 type Comment []string
@@ -86,4 +88,11 @@ type Const struct {
 type Raw struct {
 	Fs     *token.FileSet
 	Astree *ast.File
+}
+
+type Interface struct {
+	Kind    Kind
+	Comment Comment
+	Name    string
+	Funcs   []Func
 }

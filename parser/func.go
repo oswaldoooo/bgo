@@ -53,13 +53,25 @@ func funcparamsParse(src *ast.Field, dst *string) {
 	if len(src.Names) > 0 {
 		*dst = src.Names[0].Name + ":"
 	}
-	if ident, ok := src.Type.(*ast.Ident); ok {
-		*dst += ident.Name
-	} else if ident, ok := src.Type.(*ast.StarExpr); ok {
-		*dst += "*" + ident.X.(*ast.Ident).Name
-	} else {
-		println("warning parse func param type failed")
-	}
+	//make it easy the type transfer
+	*dst += getExprStr(src.Type)
+	// if ident, ok := src.Type.(*ast.Ident); ok {
+	// 	*dst += ident.Name
+	// } else if ident, ok := src.Type.(*ast.StarExpr); ok {
+	// 	//todo: not only has ident and has index expr like xxx.xxxxx
+	// 	// *dst += "*" + ident.X.(*ast.Ident).Name
+	// 	if idd, ok := ident.X.(*ast.Ident); ok {
+	// 		*dst = "*" + idd.Name
+	// 	} else if idd, ok := ident.X.(*ast.IndexExpr); ok {
+	// 		iddd := idd.Index.(*ast.Ident)
+	// 		if sex, ok := idd.X.(*ast.SelectorExpr); ok {
+	// 			*dst = "*" + sex.X.(*ast.Ident).Name + "." + sex.Sel.Name + "[" + iddd.Name + "]"
+	// 		}
+
+	// 	}
+	// } else {
+	// 	println("warning parse func param type failed")
+	// }
 }
 func commentparse(src *ast.Comment, dst *string) {
 	*dst = src.Text

@@ -1,8 +1,10 @@
 package parser
 
 import (
+	"fmt"
 	"go/ast"
 	"go/token"
+	"os"
 
 	"github.com/oswaldoooo/bgo/types"
 )
@@ -47,4 +49,69 @@ func Parse(atree *ast.File, dst *types.Packages) error {
 
 	}
 	return nil
+}
+
+type _selector ast.SelectorExpr
+
+func (s _selector) String() (content string) {
+	content += s.X.(*ast.Ident).Name
+	content += "." + s.Sel.String()
+	return
+}
+
+type _star ast.StarExpr
+
+func (s _star) String() (content string) {
+	content = "*" + getExprStr(s.X)
+	// if id, ok := s.X.(*ast.Ident); ok {
+	// 	content += id.Name
+	// 	return
+	// } else if id, ok := s.X.(*ast.SelectorExpr); ok {
+	// 	content += _selector(*id).String()
+	// } else if id, ok := s.X.(*ast.IndexExpr); ok {
+	// 	content += _index(*id).String()
+	// 	// id := s.X.(*ast.IndexExpr)
+	// 	// xxx[xxx]
+	// 	if idd, ok := id.X.(*ast.Ident); ok {
+	// 		content += idd.Name
+	// 	} else if idd, ok := id.X.(*ast.SelectorExpr); ok {
+	// 		// xxx.xxxx[xxxx]
+	// 		content += _selector(*idd).String()
+	// 	} else {
+	// 		panic("can't parse ast tree")
+	// 	}
+	// 	content += "["
+	// 	if idd, ok := id.Index.(*ast.Ident); ok {
+	// 		content += idd.Name
+	// 	} else if idd, ok := id.Index.(*ast.SelectorExpr); ok {
+	// 		content += _selector(*idd).String()
+	// 	} else if idd, ok := id.Index.(*ast.IndexExpr); ok {
+	// 		content += _index(*idd).String()
+	// 	}
+	// 	content += "]"
+
+	// }
+	return
+}
+
+type _index ast.IndexExpr
+
+func (i _index) String() (content string) {
+	content = getExprStr(i.X) + "[" + getExprStr(i.Index) + "]"
+	return
+}
+
+func getExprStr(a ast.Expr) (content string) {
+	if id, ok := a.(*ast.Ident); ok {
+		content = id.Name
+	} else if id, ok := a.(*ast.SelectorExpr); ok {
+		content = _selector(*id).String()
+	} else if id, ok := a.(*ast.IndexExpr); ok {
+		content = _index(*id).String()
+	} else if id, ok := a.(*ast.StarExpr); ok {
+		content = _star(*id).String()
+	} else {
+		fmt.Fprintln(os.Stderr, "don't know expr type")
+	}
+	return
 }

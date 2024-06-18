@@ -11,5 +11,6 @@ func NewPackage() *Package {
 		Const:     make(map[string]Const),
 		Func:      make(map[string]Func),
 		Struct:    make(map[string]Struct),
+		Interface: make(map[string]Interface),
 	}
 }

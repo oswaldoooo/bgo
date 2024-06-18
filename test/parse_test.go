@@ -26,6 +26,22 @@ func TestParse(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+func TestAst(t *testing.T) {
+	fs := token.NewFileSet()
+	asf, err := parser.ParseFile(fs, "example.go", nil, parser.ParseComments|parser.AllErrors)
+	if err != nil {
+		t.Fatal(err)
+	}
+	f, err := os.OpenFile("example.ast", os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+	err = ast.Fprint(f, fs, asf, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
 func TestShowOrigin(t *testing.T) {
 	fs := token.NewFileSet()
 	af, err := parser.ParseFile(fs, "example.go", nil, parser.AllErrors|parser.ParseComments)
