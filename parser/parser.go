@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/token"
 	"os"
+	"strings"
 
 	"github.com/oswaldoooo/bgo/types"
 )
@@ -101,17 +102,49 @@ func (i _index) String() (content string) {
 	return
 }
 
+type _index_list ast.IndexListExpr
+
+func (il _index_list) String() (content string) {
+	content = getExprStr(il.X) + "["
+	content_list := make([]string, len(il.Indices))
+	for i, ii := range il.Indices {
+		content_list[i] = getExprStr(ii)
+	}
+	content += strings.Join(content_list, ",")
+	content += "]"
+	return
+}
+
 func getExprStr(a ast.Expr) (content string) {
-	if id, ok := a.(*ast.Ident); ok {
+	if a == nil {
+		return
+	}
+	switch id := a.(type) {
+	case *ast.Ident:
 		content = id.Name
-	} else if id, ok := a.(*ast.SelectorExpr); ok {
+	case *ast.SelectorExpr:
 		content = _selector(*id).String()
-	} else if id, ok := a.(*ast.IndexExpr); ok {
+	case *ast.IndexExpr:
 		content = _index(*id).String()
-	} else if id, ok := a.(*ast.StarExpr); ok {
+	case *ast.IndexListExpr:
+		content = _index_list(*id).String()
+	case *ast.StarExpr:
 		content = _star(*id).String()
-	} else {
+	default:
 		fmt.Fprintln(os.Stderr, "don't know expr type")
 	}
+	// if id, ok := a.(*ast.Ident); ok {
+	// 	content = id.Name
+	// } else if id, ok := a.(*ast.SelectorExpr); ok {
+	// 	content = _selector(*id).String()
+	// } else if id, ok := a.(*ast.IndexExpr); ok {
+	// 	content = _index(*id).String()
+	// } else if id, ok := a.(*ast.StarExpr); ok {
+	// 	content = _star(*id).String()
+	// } else if id, ok := a.(*ast.IndexListExpr); ok {
+	// 	content = _index_list(*id).String()
+	// } else {
+	// 	fmt.Fprintln(os.Stderr, "don't know expr type")
+	// }
 	return
 }

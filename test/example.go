@@ -15,11 +15,11 @@ type X interface {
 	X() int32
 }
 
-// this is validator
-type Validator interface {
-	X
-	Validate(any) error
-}
+// // this is validator
+// type Validator interface {
+// 	X
+// 	Validate(any) error
+// }
 
 // gen_enum
 type Module int32
@@ -43,3 +43,15 @@ type Greeter2 struct{}
 func GetMyName() *types.Group[string] {
 	return &types.Group[string]{}
 }
+
+//template test
+
+type Result[T, E any] struct {
+	T T
+	E E
+}
+type PrefixKey[T any] struct {
+	Key T
+}
+
+var result Result[string, PrefixKey[int]]

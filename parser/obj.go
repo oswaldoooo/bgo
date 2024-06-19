@@ -101,13 +101,18 @@ func parsevar(src *ast.GenDecl, packages *types.Packages, currpkg *types.Package
 		vtp.Kind = types.VariableType
 		vspec := spec.(*ast.ValueSpec)
 		vtp.Name = vspec.Names[0].Name
-		if exp, ok := vspec.Type.(*ast.Ident); ok {
-			vtp.Name += ":" + exp.Name
-		} else if exp, ok := vspec.Type.(*ast.StarExpr); ok {
-			vtp.Name += ":*" + exp.X.(*ast.Ident).Name
-		} else {
-			println("warning parse variable type failed")
+		fmt.Println("parse variable " + vtp.Name)
+		tpstr := getExprStr(vspec.Type)
+		if len(tpstr) > 0 {
+			vtp.Name += ":" + tpstr
 		}
+		// if exp, ok := vspec.Type.(*ast.Ident); ok {
+		// 	vtp.Name += ":" + exp.Name
+		// } else if exp, ok := vspec.Type.(*ast.StarExpr); ok {
+		// 	vtp.Name += ":*" + exp.X.(*ast.Ident).Name
+		// } else {
+		// 	println("warning parse variable type failed")
+		// }
 		//parse value
 		vtp.Value = parsevalue(vspec.Names, vspec.Values)
 		//parse comment
