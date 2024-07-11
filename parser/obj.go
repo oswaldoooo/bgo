@@ -10,7 +10,7 @@ import (
 	"github.com/oswaldoooo/bgo/types"
 )
 
-func parseobj(src *ast.GenDecl, packages *types.Packages, currpkg *types.Package) error {
+func parseobj(ctx *context, src *ast.GenDecl, packages *types.Packages, currpkg *types.Package) error {
 	if len(src.Specs) == 0 {
 		fmt.Println("warning: not found spec at ", src.TokPos)
 		return nil
@@ -20,6 +20,8 @@ func parseobj(src *ast.GenDecl, packages *types.Packages, currpkg *types.Package
 		fmt.Println("warning: spec 0 to type spec failed")
 		return nil
 	}
+	ctx.set("start", int64(src.Pos())-1)
+	ctx.set("end", int64(src.End())-1)
 	var structtp types.Struct
 	structtp.Name = stype.Name.Name
 	structtp.Kind = types.StructType
@@ -28,9 +30,8 @@ func parseobj(src *ast.GenDecl, packages *types.Packages, currpkg *types.Package
 		utils.SliceConvert(src.Doc.List, structtp.Comment, commentparse)
 	}
 	//fill
-
 	if structType, ok := stype.Type.(*ast.StructType); ok {
-		parsestruct(structType, &structtp)
+		parsestruct(ctx, structType, &structtp)
 	} else if iftype, ok := stype.Type.(*ast.InterfaceType); ok {
 		//support for interface type
 		var dsttype types.Interface
@@ -43,6 +44,7 @@ func parseobj(src *ast.GenDecl, packages *types.Packages, currpkg *types.Package
 	} else {
 		ident, ok := stype.Type.(*ast.Ident)
 		if !ok {
+			ast.Print(nil, stype)
 			return errors.New(fmt.Sprint("can't parse ", src.TokPos))
 		}
 		structtp.Ident = ident.Name
@@ -51,7 +53,9 @@ func parseobj(src *ast.GenDecl, packages *types.Packages, currpkg *types.Package
 	currpkg.Struct[structtp.Name] = structtp
 	return nil
 }
-func parsestruct(input *ast.StructType, _dst *types.Struct) {
+func parsestruct(ctx *context, input *ast.StructType, _dst *types.Struct) {
+	_dst.Start = ctx.get("start").(int64)
+	_dst.End = ctx.get("end").(int64)
 	fieldlist := make([]types.Field, len(input.Fields.List))
 	utils.SliceConvert(input.Fields.List, fieldlist, func(src *ast.Field, dst *types.Field) {
 		dst.Kind = types.FieldType
@@ -81,7 +85,7 @@ func parsestruct(input *ast.StructType, _dst *types.Struct) {
 }
 
 // parse variable
-func parsevar(src *ast.GenDecl, packages *types.Packages, currpkg *types.Package) error {
+func parsevar(ctx *context, src *ast.GenDecl, packages *types.Packages, currpkg *types.Package) error {
 	if len(src.Specs) == 0 {
 		return nil
 	}
@@ -106,13 +110,6 @@ func parsevar(src *ast.GenDecl, packages *types.Packages, currpkg *types.Package
 		if len(tpstr) > 0 {
 			vtp.Name += ":" + tpstr
 		}
-		// if exp, ok := vspec.Type.(*ast.Ident); ok {
-		// 	vtp.Name += ":" + exp.Name
-		// } else if exp, ok := vspec.Type.(*ast.StarExpr); ok {
-		// 	vtp.Name += ":*" + exp.X.(*ast.Ident).Name
-		// } else {
-		// 	println("warning parse variable type failed")
-		// }
 		//parse value
 		vtp.Value = parsevalue(vspec.Names, vspec.Values)
 		//parse comment
@@ -120,6 +117,8 @@ func parsevar(src *ast.GenDecl, packages *types.Packages, currpkg *types.Package
 			vtp.Comment = make(types.Comment, len(vspec.Doc.List))
 			utils.SliceConvert(vspec.Doc.List, vtp.Comment, commentparse)
 		}
+		vtp.Start = int64(spec.Pos())
+		vtp.End = int64(spec.End())
 		currpkg.Variables[getRawName(vtp.Name)] = vtp
 		group.Members = append(group.Members, vtp)
 	}
@@ -130,7 +129,7 @@ func parsevar(src *ast.GenDecl, packages *types.Packages, currpkg *types.Package
 }
 
 // parse const
-func parseconst(src *ast.GenDecl, packages *types.Packages, currpkg *types.Package) error {
+func parseconst(ctx *context, src *ast.GenDecl, packages *types.Packages, currpkg *types.Package) error {
 	if len(src.Specs) == 0 {
 		return nil
 	}
@@ -150,6 +149,8 @@ func parseconst(src *ast.GenDecl, packages *types.Packages, currpkg *types.Packa
 	}
 	for _, spec := range src.Specs {
 		var vtp types.Const
+		vtp.Start = int64(spec.Pos())
+		vtp.End = int64(spec.End())
 		vtp.Kind = types.ConstType
 		vspec := spec.(*ast.ValueSpec)
 		vtp.Name = vspec.Names[0].Name

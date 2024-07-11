@@ -26,11 +26,11 @@ func Parse(atree *ast.File, dst *types.Packages) error {
 			//this is like type xxx xxx
 			switch ee.Tok {
 			case token.TYPE:
-				err = parseobj(ee, dst, pobj)
+				err = parseobj(newcontext(), ee, dst, pobj)
 			case token.CONST:
-				err = parseconst(ee, dst, pobj)
+				err = parseconst(newcontext(), ee, dst, pobj)
 			case token.VAR:
-				err = parsevar(ee, dst, pobj)
+				err = parsevar(newcontext(), ee, dst, pobj)
 			default:
 				println("unknown keyword " + ee.Tok.String())
 			}

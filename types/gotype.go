@@ -55,6 +55,8 @@ type Struct struct {
 	Name    string
 	Ident   string //default is null
 	Comment Comment
+	//v1.2
+	Start, End int64
 }
 type Field struct {
 	Kind    Kind
@@ -76,6 +78,9 @@ type Variable struct {
 	Name    string
 	Value   string
 	Comment Comment
+	//v1.2
+	Start int64
+	End   int64
 }
 
 type Const struct {
@@ -83,6 +88,9 @@ type Const struct {
 	Name    string
 	Value   string
 	Comment Comment
+	//v1.2
+	Start int64
+	End   int64
 }
 
 type Raw struct {
